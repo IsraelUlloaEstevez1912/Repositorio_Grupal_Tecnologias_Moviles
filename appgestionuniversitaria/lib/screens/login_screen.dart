@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/role_chip.dart';
+import 'home_screen.dart';
 
 const _desktopLoginImageAsset = 'assets/images/login_students.jpg';
 
@@ -570,7 +571,7 @@ class _LoginWelcomeText extends StatelessWidget {
   }
 }
 
-class _LoginFormFields extends StatelessWidget {
+class _LoginFormFields extends StatefulWidget {
   const _LoginFormFields({
     required this.obscurePassword,
     required this.onTogglePassword,
@@ -582,6 +583,13 @@ class _LoginFormFields extends StatelessWidget {
   final bool compact;
 
   @override
+  State<_LoginFormFields> createState() => _LoginFormFieldsState();
+}
+
+class _LoginFormFieldsState extends State<_LoginFormFields> {
+  String _selectedRole = 'estudiante';
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -591,27 +599,27 @@ class _LoginFormFields extends StatelessWidget {
         _CustomTextField(
           hintText: 'Ej. 2024001 o correo@edu.com',
           prefixIcon: Icons.account_circle_outlined,
-          dense: compact,
+          dense: widget.compact,
         ),
-        SizedBox(height: compact ? 14 : 18),
+        SizedBox(height: widget.compact ? 14 : 18),
         const _InputLabel('Contrasena'),
         const SizedBox(height: 8),
         _CustomTextField(
           hintText: 'Ingresa tu contrasena',
           prefixIcon: Icons.lock_outline,
-          obscureText: obscurePassword,
-          dense: compact,
+          obscureText: widget.obscurePassword,
+          dense: widget.compact,
           suffix: IconButton(
-            onPressed: onTogglePassword,
+            onPressed: widget.onTogglePassword,
             icon: Icon(
-              obscurePassword
+              widget.obscurePassword
                   ? Icons.visibility_outlined
                   : Icons.visibility_off_outlined,
               color: const Color(0xFF94A3BE),
             ),
           ),
         ),
-        SizedBox(height: compact ? 10 : 14),
+        SizedBox(height: widget.compact ? 10 : 14),
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(
@@ -628,12 +636,28 @@ class _LoginFormFields extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: compact ? 14 : 18),
+        SizedBox(height: widget.compact ? 14 : 18),
         SizedBox(
           width: double.infinity,
-          height: compact ? 52 : 56,
+          height: widget.compact ? 52 : 56,
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                PageRouteBuilder<void>(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      HomeScreen(userRole: _selectedRole),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(
+                      opacity: CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOut,
+                      ),
+                      child: child,
+                    );
+                  },
+                ),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1F63F2),
               foregroundColor: Colors.white,
@@ -649,19 +673,40 @@ class _LoginFormFields extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: compact ? 28 : 38),
+        SizedBox(height: widget.compact ? 28 : 38),
         const _ProfileDivider(),
-        SizedBox(height: compact ? 18 : 22),
+        SizedBox(height: widget.compact ? 18 : 22),
         Wrap(
           alignment: WrapAlignment.center,
           spacing: 10,
           runSpacing: 10,
-          children: const [
-            RoleChip(icon: Icons.person_outline_rounded, label: 'ESTUDIANTES'),
-            RoleChip(icon: Icons.school_outlined, label: 'DOCENTES'),
-            RoleChip(
+          children: [
+            _SelectableRoleChip(
+              icon: Icons.person_outline_rounded,
+              label: 'ESTUDIANTES',
+              value: 'estudiante',
+              isSelected: _selectedRole == 'estudiante',
+              onTap: () {
+                setState(() => _selectedRole = 'estudiante');
+              },
+            ),
+            _SelectableRoleChip(
+              icon: Icons.school_outlined,
+              label: 'DOCENTES',
+              value: 'docente',
+              isSelected: _selectedRole == 'docente',
+              onTap: () {
+                setState(() => _selectedRole = 'docente');
+              },
+            ),
+            _SelectableRoleChip(
               icon: Icons.admin_panel_settings_outlined,
               label: 'ADMIN',
+              value: 'admin',
+              isSelected: _selectedRole == 'admin',
+              onTap: () {
+                setState(() => _selectedRole = 'admin');
+              },
             ),
           ],
         ),
@@ -957,6 +1002,59 @@ class _ProfileDivider extends StatelessWidget {
         ),
         const Expanded(child: Divider(color: Color(0xFFDCE4F2))),
       ],
+    );
+  }
+}
+
+class _SelectableRoleChip extends StatelessWidget {
+  const _SelectableRoleChip({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF1F63F2) : Colors.white,
+          border: Border.all(
+            color: isSelected ? const Color(0xFF1F63F2) : const Color(0xFFDCE4F2),
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isSelected ? Colors.white : const Color(0xFF6D7A96),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: isSelected ? Colors.white : const Color(0xFF6D7A96),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
