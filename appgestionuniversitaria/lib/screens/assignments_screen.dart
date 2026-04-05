@@ -205,7 +205,14 @@ class _AssignmentsPageState extends State<AssignmentsPage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {},
         backgroundColor: const Color(0xFF1F63F2),
-        label: const Text('Nueva Asignatura'),
+        extendedTextStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
+        label: const Text(
+          'Nueva Asignatura',
+          style: TextStyle(color: Colors.white),
+        ), 
         icon: const Icon(Icons.add),
       ),
       bottomNavigationBar: _buildBottomNavBar(),
