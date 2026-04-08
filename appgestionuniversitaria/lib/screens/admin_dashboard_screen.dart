@@ -1,219 +1,27 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/app_bottom_nav.dart';
+import 'academic_reports_page.dart';
+import 'assignments_screen.dart';
+import 'grade_entry_screen.dart';
+import 'home_page.dart';
+import 'list.dart';
+import 'matricula.dart';
+import 'notifications.dart';
+import 'profile_screen.dart';
+
 class AdminDashboardPage extends StatefulWidget {
-  const AdminDashboardPage({super.key});
+  const AdminDashboardPage({super.key, this.userRole = 'admin'});
+
+  final String userRole;
 
   @override
   State<AdminDashboardPage> createState() => _AdminDashboardPageState();
 }
 
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: const Text(
-          'Panel de Control',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: false,
-        actions: [
-          IconButton(
-            icon: Stack(
-              children: [
-                const Icon(Icons.notifications_outlined, color: Colors.black),
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFFF6B6B),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Text(
-                      '3',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Summary Section
-            const Text(
-              'Resumen General',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Text(
-                  'Últimos 30 días',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  '+5%',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.green[600],
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Stats Cards
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    icon: Icons.people,
-                    label: 'ESTUDIANTES',
-                    value: '1,240',
-                    change: '+5%',
-                    bgColor: const Color(0xFFE3F2FD),
-                    iconColor: const Color(0xFF1F63F2),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard(
-                    icon: Icons.person_outline,
-                    label: 'DOCENTES',
-                    value: '85',
-                    change: '+2%',
-                    bgColor: const Color(0xFFF3E5F5),
-                    iconColor: const Color(0xFF9C27B0),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            _buildStatCard(
-              icon: Icons.class_,
-              label: 'CURSOS ACTIVOS',
-              value: '42',
-              change: '-1%',
-              bgColor: const Color(0xFFFCE4EC),
-              iconColor: const Color(0xFFE91E63),
-              isWide: true,
-              isNegative: true,
-            ),
-
-            const SizedBox(height: 32),
-
-            // Quick Access Section
-            const Text(
-              'Accesos Rápidos',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            _buildQuickAccessCard(
-              icon: Icons.person_add,
-              title: 'Registrar Estudiante',
-              subtitle: 'Agregar nuevo perfil al sistema',
-              onTap: () {},
-            ),
-            const SizedBox(height: 12),
-            _buildQuickAccessCard(
-              icon: Icons.assignment,
-              title: 'Crear Asignatura',
-              subtitle: 'Diseñar nuevo plan de estudios',
-              onTap: () {},
-            ),
-            const SizedBox(height: 12),
-            _buildQuickAccessCard(
-              icon: Icons.bar_chart,
-              title: 'Ver Reportes',
-              subtitle: 'Análisis académico y financiero',
-              onTap: () {},
-            ),
-
-            const SizedBox(height: 32),
-
-            // Recent Activity Section
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Actividad Reciente',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'Ver Todo',
-                    style: TextStyle(
-                      color: Color(0xFF1F63F2),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            _buildActivityItem(
-                icon: Icons.person_add_outlined,
-                title: 'Registro de estudiante: Jane Cooper',
-                time: 'hace 2 minutos'),
-            const SizedBox(height: 12),
-            _buildActivityItem(
-                icon: Icons.assignment_outlined,
-                title: 'Asignatura "Física Avanzada" actualizada',
-                time: 'hace 6 horas'),
-            const SizedBox(height: 12),
-            _buildActivityItem(
-                icon: Icons.grade_outlined,
-                title: 'Calificaciones registradas: CS201',
-                time: 'hace 1 día'),
-            const SizedBox(height: 12),
-            _buildActivityItem(
-                icon: Icons.event_note_outlined,
-                title: 'Nuevo evento académico creado',
-                time: 'hace 2 días'),
-          ],
-        ),
-      ),
-      bottomNavigationBar: _buildBottomNavBar(),
-    );
+  void _openPage(Widget page) {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
   }
 
   Widget _buildStatCard({
@@ -223,7 +31,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     required String change,
     required Color bgColor,
     required Color iconColor,
-    bool isWide = false,
     bool isNegative = false,
   }) {
     return Container(
@@ -284,7 +91,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -302,14 +109,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1F63F2).withOpacity(0.1),
+                    color: const Color(0xFF1F63F2).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
-                    icon,
-                    color: const Color(0xFF1F63F2),
-                    size: 24,
-                  ),
+                  child: Icon(icon, color: const Color(0xFF1F63F2), size: 24),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -327,10 +130,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       const SizedBox(height: 4),
                       Text(
                         subtitle,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -358,14 +158,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFF1F63F2).withOpacity(0.1),
+            color: const Color(0xFF1F63F2).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
-            icon,
-            color: const Color(0xFF1F63F2),
-            size: 20,
-          ),
+          child: Icon(icon, color: const Color(0xFF1F63F2), size: 20),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -385,10 +181,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               const SizedBox(height: 2),
               Text(
                 time,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 11, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -397,30 +190,236 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  Widget _buildBottomNavBar() {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: Colors.white,
-      selectedItemColor: const Color(0xFF1F63F2),
-      unselectedItemColor: Colors.grey[600],
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Inicio',
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Panel de Control',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.school),
-          label: 'Académico',
+        centerTitle: false,
+        actions: [
+          IconButton(
+            icon: Stack(
+              children: [
+                const Icon(Icons.notifications_outlined, color: Colors.black),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFF6B6B),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Text(
+                      '3',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            onPressed: () =>
+                _openPage(NotificationsScreen(userRole: widget.userRole)),
+          ),
+          IconButton(
+            icon: const Icon(Icons.person_outline, color: Colors.black),
+            onPressed: () =>
+                _openPage(ProfileScreen(userRole: widget.userRole)),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Resumen General',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Text(
+                  'Ultimos 30 dias',
+                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                ),
+                const Spacer(),
+                Text(
+                  '+5%',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.green[600],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.people,
+                    label: 'ESTUDIANTES',
+                    value: '1,240',
+                    change: '+5%',
+                    bgColor: const Color(0xFFE3F2FD),
+                    iconColor: const Color(0xFF1F63F2),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.person_outline,
+                    label: 'DOCENTES',
+                    value: '85',
+                    change: '+2%',
+                    bgColor: const Color(0xFFF3E5F5),
+                    iconColor: const Color(0xFF9C27B0),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _buildStatCard(
+              icon: Icons.class_,
+              label: 'CURSOS ACTIVOS',
+              value: '42',
+              change: '-1%',
+              bgColor: const Color(0xFFFCE4EC),
+              iconColor: const Color(0xFFE91E63),
+              isNegative: true,
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Accesos Rapidos',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildQuickAccessCard(
+              icon: Icons.people_alt_outlined,
+              title: 'Lista de Estudiantes',
+              subtitle: 'Ver y registrar estudiantes',
+              onTap: () =>
+                  _openPage(StudentListScreen(userRole: widget.userRole)),
+            ),
+            const SizedBox(height: 12),
+            _buildQuickAccessCard(
+              icon: Icons.assignment_outlined,
+              title: 'Gestionar Asignaturas',
+              subtitle: 'Entrar al modulo academico',
+              onTap: () =>
+                  _openPage(AssignmentsPage(userRole: widget.userRole)),
+            ),
+            const SizedBox(height: 12),
+            _buildQuickAccessCard(
+              icon: Icons.fact_check_outlined,
+              title: 'Registrar Calificaciones',
+              subtitle: 'Abrir la captura de notas',
+              onTap: () =>
+                  _openPage(GradeEntryScreen(userRole: widget.userRole)),
+            ),
+            const SizedBox(height: 12),
+            _buildQuickAccessCard(
+              icon: Icons.dashboard_customize_outlined,
+              title: 'Centro Academico',
+              subtitle: 'Vista puente de reportes y horario',
+              onTap: () => _openPage(MyHomePage(userRole: widget.userRole)),
+            ),
+            const SizedBox(height: 12),
+            _buildQuickAccessCard(
+              icon: Icons.bar_chart_outlined,
+              title: 'Ver Reportes',
+              subtitle: 'Analitica academica y de matricula',
+              onTap: () =>
+                  _openPage(AcademicReportsPage(userRole: widget.userRole)),
+            ),
+            const SizedBox(height: 12),
+            _buildQuickAccessCard(
+              icon: Icons.account_balance_wallet_outlined,
+              title: 'Gestion de Matricula',
+              subtitle: 'Revisar cargos y pagos',
+              onTap: () =>
+                  _openPage(MatriculaScreen(userRole: widget.userRole)),
+            ),
+            const SizedBox(height: 32),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Actividad Reciente',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      _openPage(NotificationsScreen(userRole: widget.userRole)),
+                  child: const Text(
+                    'Ver Todo',
+                    style: TextStyle(
+                      color: Color(0xFF1F63F2),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _buildActivityItem(
+              icon: Icons.person_add_outlined,
+              title: 'Registro de estudiante: Jane Cooper',
+              time: 'hace 2 minutos',
+            ),
+            const SizedBox(height: 12),
+            _buildActivityItem(
+              icon: Icons.assignment_outlined,
+              title: 'Asignatura "Fisica Avanzada" actualizada',
+              time: 'hace 6 horas',
+            ),
+            const SizedBox(height: 12),
+            _buildActivityItem(
+              icon: Icons.grade_outlined,
+              title: 'Calificaciones registradas: CS201',
+              time: 'hace 1 dia',
+            ),
+            const SizedBox(height: 12),
+            _buildActivityItem(
+              icon: Icons.event_note_outlined,
+              title: 'Nuevo evento academico creado',
+              time: 'hace 2 dias',
+            ),
+          ],
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.attach_money),
-          label: 'Finanzas',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Ajustes',
-        ),
-      ],
+      ),
+      bottomNavigationBar: AppBottomNavBar(
+        currentIndex: 0,
+        userRole: widget.userRole,
+      ),
     );
   }
 }

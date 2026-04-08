@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/role_chip.dart';
 import 'home_screen.dart';
 
 const _desktopLoginImageAsset = 'assets/images/login_students.jpg';
@@ -646,15 +645,16 @@ class _LoginFormFieldsState extends State<_LoginFormFields> {
                 PageRouteBuilder<void>(
                   pageBuilder: (context, animation, secondaryAnimation) =>
                       HomeScreen(userRole: _selectedRole),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(
-                      opacity: CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeOut,
-                      ),
-                      child: child,
-                    );
-                  },
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(
+                          opacity: CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeOut,
+                          ),
+                          child: child,
+                        );
+                      },
                 ),
               );
             },
@@ -1030,7 +1030,9 @@ class _SelectableRoleChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected ? const Color(0xFF1F63F2) : Colors.white,
           border: Border.all(
-            color: isSelected ? const Color(0xFF1F63F2) : const Color(0xFFDCE4F2),
+            color: isSelected
+                ? const Color(0xFF1F63F2)
+                : const Color(0xFFDCE4F2),
             width: 2,
           ),
           borderRadius: BorderRadius.circular(20),
