@@ -7,12 +7,14 @@ class Student {
   final String id;
   final String major;
   final String imageUrl;
+  final String status;
 
   Student({
     required this.name,
     required this.id,
     required this.major,
     required this.imageUrl,
+    this.status = 'Activo',
   });
 
   Map<String, dynamic> toJson() => {
@@ -20,6 +22,7 @@ class Student {
         'id': id,
         'major': major,
         'imageUrl': imageUrl,
+        'status': status,
       };
 
   factory Student.fromJson(Map<String, dynamic> json) {
@@ -28,6 +31,7 @@ class Student {
       id: json['id'],
       major: json['major'],
       imageUrl: json['imageUrl'],
+      status: json['status'] ?? 'Activo',
     );
   }
 }
@@ -43,6 +47,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
   List<Student> _allStudents = [];
   List<Student> _filteredStudents = [];
   final TextEditingController _searchController = TextEditingController();
+  String _selectedFilter = 'Todos';
 
   // Ruta del archivo temporal
   File get _tempFile {
@@ -77,12 +82,12 @@ class _StudentListScreenState extends State<StudentListScreen> {
         // Datos por defecto si el archivo aún no existe
         setState(() {
           _allStudents = [
-            Student(name: 'Alicia Johnson', id: '2023001', major: 'INGENIERÍA EN COMPUTACIÓN', imageUrl: 'https://i.pravatar.cc/150?u=1'),
-            Student(name: 'Marcos Chen', id: '2023042', major: 'ARQUITECTURA', imageUrl: 'https://i.pravatar.cc/150?u=11'),
-            Student(name: 'Sofía Rodríguez', id: '2022115', major: 'MARKETING DIGITAL', imageUrl: 'https://i.pravatar.cc/150?u=5'),
-            Student(name: 'David Kim', id: '2023088', major: 'INGENIERÍA MECÁNICA', imageUrl: 'https://i.pravatar.cc/150?u=12'),
-            Student(name: 'Elena Vance', id: '2021005', major: 'PSICOLOGÍA', imageUrl: 'https://i.pravatar.cc/150?u=9'),
-            Student(name: 'Jordan Smith', id: '2023022', major: 'CIBERSEGURIDAD', imageUrl: 'https://i.pravatar.cc/150?u=13'),
+            Student(name: 'Alicia Johnson', id: '2023001', major: 'INGENIERÍA EN COMPUTACIÓN', imageUrl: 'https://i.pravatar.cc/150?u=1', status: 'Activo'),
+            Student(name: 'Marcos Chen', id: '2023042', major: 'ARQUITECTURA', imageUrl: 'https://i.pravatar.cc/150?u=11', status: 'Activo'),
+            Student(name: 'Sofía Rodríguez', id: '2022115', major: 'MARKETING DIGITAL', imageUrl: 'https://i.pravatar.cc/150?u=5', status: 'Graduado'),
+            Student(name: 'David Kim', id: '2023088', major: 'INGENIERÍA MECÁNICA', imageUrl: 'https://i.pravatar.cc/150?u=12', status: 'Activo'),
+            Student(name: 'Elena Vance', id: '2021005', major: 'PSICOLOGÍA', imageUrl: 'https://i.pravatar.cc/150?u=9', status: 'Graduado'),
+            Student(name: 'Jordan Smith', id: '2023022', major: 'CIBERSEGURIDAD', imageUrl: 'https://i.pravatar.cc/150?u=13', status: 'Activo'),
           ];
           _filteredStudents = List.from(_allStudents);
         });
@@ -103,25 +108,36 @@ class _StudentListScreenState extends State<StudentListScreen> {
     }
   }
 
-  void _onSearchChanged() {
+  void _applyFilters() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      if (query.isEmpty) {
-        _filteredStudents = List.from(_allStudents);
-      } else {
-        _filteredStudents = _allStudents.where((student) {
-          return student.name.toLowerCase().contains(query) ||
+      _filteredStudents = _allStudents.where((student) {
+        final matchesQuery = query.isEmpty ||
+                 student.name.toLowerCase().contains(query) ||
                  student.id.toLowerCase().contains(query) ||
                  student.major.toLowerCase().contains(query);
-        }).toList();
-      }
+                 
+        bool matchesFilter = true;
+        if (_selectedFilter == 'Activos') {
+          matchesFilter = student.status == 'Activo';
+        } else if (_selectedFilter == 'Graduados') {
+          matchesFilter = student.status == 'Graduado';
+        }
+        
+        return matchesQuery && matchesFilter;
+      }).toList();
     });
+  }
+
+  void _onSearchChanged() {
+    _applyFilters();
   }
 
   void _showAddStudentDialog() {
     final nameController = TextEditingController();
     final idController = TextEditingController();
     final majorController = TextEditingController();
+    String selectedStatus = 'Activo';
 
     showDialog(
       context: context,
@@ -156,6 +172,29 @@ class _StudentListScreenState extends State<StudentListScreen> {
                     icon: Icon(Icons.school),
                   ),
                 ),
+                const SizedBox(height: 16),
+                StatefulBuilder(
+                  builder: (context, setDialogState) {
+                    return DropdownButtonFormField<String>(
+                      value: selectedStatus,
+                      decoration: const InputDecoration(
+                        labelText: 'Estado',
+                        icon: Icon(Icons.info_outline),
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: 'Activo', child: Text('Activo')),
+                        DropdownMenuItem(value: 'Graduado', child: Text('Graduado')),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setDialogState(() {
+                            selectedStatus = value;
+                          });
+                        }
+                      },
+                    );
+                  }
+                ),
               ],
             ),
           ),
@@ -178,6 +217,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                     major: majorController.text.toUpperCase(),
                     // Generar un avatar usando el ID como seed
                     imageUrl: 'https://i.pravatar.cc/150?u=${idController.text}',
+                    status: selectedStatus,
                   );
                   
                   setState(() {
@@ -185,7 +225,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                   });
                   
                   await _saveStudents(); // Guarda en el archivo JSON temporal
-                  _onSearchChanged(); // Actualiza el filtro actual de búsqueda
+                  _applyFilters(); // Actualiza el filtro actual de búsqueda
                   
                   if (context.mounted) {
                     Navigator.pop(context);
@@ -268,11 +308,20 @@ class _StudentListScreenState extends State<StudentListScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
               children: [
-                _buildChip('Todas las Carreras', isSelected: true),
+                _buildChip('Todos', isSelected: _selectedFilter == 'Todos', onTap: () {
+                  setState(() { _selectedFilter = 'Todos'; });
+                  _applyFilters();
+                }),
                 const SizedBox(width: 8),
-                _buildChip('Activos', hasDropdown: true),
+                _buildChip('Activos', isSelected: _selectedFilter == 'Activos', onTap: () {
+                  setState(() { _selectedFilter = 'Activos'; });
+                  _applyFilters();
+                }),
                 const SizedBox(width: 8),
-                _buildChip('Graduados'),
+                _buildChip('Graduados', isSelected: _selectedFilter == 'Graduados', onTap: () {
+                  setState(() { _selectedFilter = 'Graduados'; });
+                  _applyFilters();
+                }),
               ],
             ),
           ),
@@ -343,6 +392,22 @@ class _StudentListScreenState extends State<StudentListScreen> {
                                   fontWeight: FontWeight.w800,
                                   fontSize: 11,
                                   letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: student.status == 'Activo' ? Colors.green.shade100 : Colors.orange.shade100,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  student.status,
+                                  style: TextStyle(
+                                    color: student.status == 'Activo' ? Colors.green.shade800 : Colors.orange.shade800,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ],
@@ -435,36 +500,42 @@ class _StudentListScreenState extends State<StudentListScreen> {
     );
   }
 
-  Widget _buildChip(String label, {bool isSelected = false, bool hasDropdown = false}) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: isSelected ? 18.0 : 14.0, 
-        vertical: 8.0
-      ),
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFF2563EB) : Colors.white,
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? Colors.white : const Color(0xFF1E293B),
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-              fontSize: 13,
-            ),
+  Widget _buildChip(String label, {bool isSelected = false, bool hasDropdown = false, VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: isSelected ? 18.0 : 14.0, 
+          vertical: 8.0
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF2563EB) : Colors.white,
+          borderRadius: BorderRadius.circular(20.0),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF2563EB) : Colors.grey.shade300,
           ),
-          if (hasDropdown) ...[
-            const SizedBox(width: 4),
-            Icon(
-              Icons.keyboard_arrow_down,
-              size: 20,
-              color: isSelected ? Colors.white : const Color(0xFF1E293B),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : const Color(0xFF1E293B),
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                fontSize: 13,
+              ),
             ),
-          ]
-        ],
+            if (hasDropdown) ...[
+              const SizedBox(width: 4),
+              Icon(
+                Icons.keyboard_arrow_down,
+                size: 20,
+                color: isSelected ? Colors.white : const Color(0xFF1E293B),
+              ),
+            ]
+          ],
+        ),
       ),
     );
   }
