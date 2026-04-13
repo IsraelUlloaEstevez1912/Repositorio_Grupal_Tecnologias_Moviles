@@ -9,12 +9,14 @@ class Student {
     required this.id,
     required this.major,
     required this.imageUrl,
+    this.status = 'Activo',
   });
 
   final String name;
   final String id;
   final String major;
   final String imageUrl;
+  final String status;
 }
 
 class StudentListScreen extends StatefulWidget {
@@ -31,6 +33,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
 
   late List<Student> _allStudents;
   late List<Student> _filteredStudents;
+  String _selectedFilter = 'Todas';
 
   @override
   void initState() {
@@ -41,36 +44,42 @@ class _StudentListScreenState extends State<StudentListScreen> {
         id: '2023001',
         major: 'INGENIERIA EN COMPUTACION',
         imageUrl: 'https://i.pravatar.cc/150?u=1',
+        status: 'Activo',
       ),
       Student(
         name: 'Marcos Chen',
         id: '2023042',
         major: 'ARQUITECTURA',
         imageUrl: 'https://i.pravatar.cc/150?u=11',
+        status: 'Activo',
       ),
       Student(
         name: 'Sofia Rodriguez',
         id: '2022115',
         major: 'MARKETING DIGITAL',
         imageUrl: 'https://i.pravatar.cc/150?u=5',
+        status: 'Graduado',
       ),
       Student(
         name: 'David Kim',
         id: '2023088',
         major: 'INGENIERIA MECANICA',
         imageUrl: 'https://i.pravatar.cc/150?u=12',
+        status: 'Activo',
       ),
       Student(
         name: 'Elena Vance',
         id: '2021005',
         major: 'PSICOLOGIA',
         imageUrl: 'https://i.pravatar.cc/150?u=9',
+        status: 'Graduado',
       ),
       Student(
         name: 'Jordan Smith',
         id: '2023022',
         major: 'CIBERSEGURIDAD',
         imageUrl: 'https://i.pravatar.cc/150?u=13',
+        status: 'Activo',
       ),
     ];
     _filteredStudents = List<Student>.from(_allStudents);
@@ -87,16 +96,73 @@ class _StudentListScreenState extends State<StudentListScreen> {
     final query = _searchController.text.toLowerCase();
 
     setState(() {
-      if (query.isEmpty) {
-        _filteredStudents = List<Student>.from(_allStudents);
-      } else {
-        _filteredStudents = _allStudents.where((student) {
-          return student.name.toLowerCase().contains(query) ||
-              student.id.toLowerCase().contains(query) ||
-              student.major.toLowerCase().contains(query);
-        }).toList();
-      }
+      _filteredStudents = _allStudents.where((student) {
+        final matchesQuery = student.name.toLowerCase().contains(query) ||
+            student.id.toLowerCase().contains(query) ||
+            student.major.toLowerCase().contains(query);
+
+        bool matchesFilter = true;
+        if (_selectedFilter == 'Activos') {
+          matchesFilter = student.status == 'Activo';
+        } else if (_selectedFilter == 'Graduados') {
+          matchesFilter = student.status == 'Graduado';
+        }
+
+        return matchesQuery && matchesFilter;
+      }).toList();
     });
+  }
+
+  void _setFilter(String filter) {
+    setState(() {
+      _selectedFilter = filter;
+    });
+    _onSearchChanged();
+  }
+
+  void _showStudentDetails(Student student) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text(
+            'Perfil de Estudiante',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PersonAvatar(name: student.name, radius: 40),
+              const SizedBox(height: 16),
+              Text(
+                student.name,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text('ID: ${student.id}', style: const TextStyle(fontSize: 14)),
+              Text('Carrera: ${student.major}', style: const TextStyle(fontSize: 14)),
+              const SizedBox(height: 4),
+              Text(
+                'Estado: ${student.status}',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: student.status == 'Activo' ? Colors.green : Colors.blueGrey,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showAddStudentDialog() {
@@ -197,36 +263,40 @@ class _StudentListScreenState extends State<StudentListScreen> {
     String label, {
     bool isSelected = false,
     bool hasDropdown = false,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: isSelected ? 18 : 14,
-        vertical: 8,
-      ),
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFF2563EB) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? Colors.white : const Color(0xFF1E293B),
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-              fontSize: 13,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: isSelected ? 18 : 14,
+          vertical: 8,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF2563EB) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : const Color(0xFF1E293B),
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                fontSize: 13,
+              ),
             ),
-          ),
-          if (hasDropdown) ...[
-            const SizedBox(width: 4),
-            Icon(
-              Icons.keyboard_arrow_down,
-              size: 20,
-              color: isSelected ? Colors.white : const Color(0xFF1E293B),
-            ),
+            if (hasDropdown) ...[
+              const SizedBox(width: 4),
+              Icon(
+                Icons.keyboard_arrow_down,
+                size: 20,
+                color: isSelected ? Colors.white : const Color(0xFF1E293B),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -294,11 +364,24 @@ class _StudentListScreenState extends State<StudentListScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                _buildChip('Todas las Carreras', isSelected: true),
+                _buildChip(
+                  'Todas las Carreras',
+                  isSelected: _selectedFilter == 'Todas',
+                  onTap: () => _setFilter('Todas'),
+                ),
                 const SizedBox(width: 8),
-                _buildChip('Activos', hasDropdown: true),
+                _buildChip(
+                  'Activos',
+                  isSelected: _selectedFilter == 'Activos',
+                  hasDropdown: true,
+                  onTap: () => _setFilter('Activos'),
+                ),
                 const SizedBox(width: 8),
-                _buildChip('Graduados'),
+                _buildChip(
+                  'Graduados',
+                  isSelected: _selectedFilter == 'Graduados',
+                  onTap: () => _setFilter('Graduados'),
+                ),
               ],
             ),
           ),
@@ -378,7 +461,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                               Icons.chevron_right,
                               color: Colors.black26,
                             ),
-                            onTap: () {},
+                            onTap: () => _showStudentDetails(student),
                           ),
                         ),
                       );

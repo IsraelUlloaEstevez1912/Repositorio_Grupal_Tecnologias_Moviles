@@ -587,6 +587,15 @@ class _LoginFormFields extends StatefulWidget {
 
 class _LoginFormFieldsState extends State<_LoginFormFields> {
   String _selectedRole = 'estudiante';
+  final TextEditingController _idController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _idController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -596,15 +605,17 @@ class _LoginFormFieldsState extends State<_LoginFormFields> {
         const _InputLabel('ID o Correo'),
         const SizedBox(height: 8),
         _CustomTextField(
-          hintText: 'Ej. 2024001 o correo@edu.com',
+          controller: _idController,
+          hintText: 'Ej. $_selectedRole',
           prefixIcon: Icons.account_circle_outlined,
           dense: widget.compact,
         ),
         SizedBox(height: widget.compact ? 14 : 18),
-        const _InputLabel('Contrasena'),
+        const _InputLabel('Contraseña'),
         const SizedBox(height: 8),
         _CustomTextField(
-          hintText: 'Ingresa tu contrasena',
+          controller: _passwordController,
+          hintText: 'Ingresa tu contraseña',
           prefixIcon: Icons.lock_outline,
           obscureText: widget.obscurePassword,
           dense: widget.compact,
@@ -630,7 +641,7 @@ class _LoginFormFieldsState extends State<_LoginFormFields> {
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             child: const Text(
-              'Olvidaste tu contrasena?',
+              'Olvidaste tu contraseña?',
               style: TextStyle(fontWeight: FontWeight.w700),
             ),
           ),
@@ -641,6 +652,46 @@ class _LoginFormFieldsState extends State<_LoginFormFields> {
           height: widget.compact ? 52 : 56,
           child: ElevatedButton(
             onPressed: () {
+              final currentId = _idController.text.trim().toLowerCase();
+              final currentPass = _passwordController.text.trim();
+
+              if (currentId.isEmpty || currentPass.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Por favor, ingresa tu ID y contraseña.'),
+                    backgroundColor: Colors.redAccent,
+                  ),
+                );
+                return;
+              }
+              
+              // Base de datos simulada para los 3 perfiles
+              final Map<String, Map<String, String>> mockDatabase = {
+                'estudiante': {'id': 'estudiante', 'pass': '1234'},
+                'docente': {'id': 'docente', 'pass': '1234'},
+                'admin': {'id': 'admin', 'pass': '1234'},
+              };
+
+              // Validar contra la pseudo base de datos
+              final validUser = mockDatabase[_selectedRole];
+              if (validUser == null || validUser['id'] != currentId || validUser['pass'] != currentPass) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Credenciales incorrectas. Para el perfil $_selectedRole usa ID: "$_selectedRole" y Pass: "1234"'),
+                    backgroundColor: Colors.redAccent,
+                  ),
+                );
+                return;
+              }
+
+              // Mostrar mensaje de éxito
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('¡Bienvenido, $_selectedRole!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+
               Navigator.of(context).pushReplacement(
                 PageRouteBuilder<void>(
                   pageBuilder: (context, animation, secondaryAnimation) =>
@@ -942,6 +993,7 @@ class _CustomTextField extends StatelessWidget {
     this.obscureText = false,
     this.suffix,
     this.dense = false,
+    this.controller,
   });
 
   final String hintText;
@@ -949,10 +1001,12 @@ class _CustomTextField extends StatelessWidget {
   final bool obscureText;
   final Widget? suffix;
   final bool dense;
+  final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       obscureText: obscureText,
       decoration: InputDecoration(
         hintText: hintText,
