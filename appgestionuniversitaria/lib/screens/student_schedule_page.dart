@@ -233,6 +233,7 @@ class StudentSchedulePage extends StatelessWidget {
               : _isTeacher
               ? Icons.add_task
               : Icons.add,
+          color: Colors.white,
         ),
       ),
       bottomNavigationBar: AppBottomNavBar(currentIndex: 1, userRole: userRole),
