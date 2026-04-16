@@ -23,12 +23,14 @@ class AcademicReportsPage extends StatelessWidget {
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
-          children: const [
-            PerformanceCard(),
-            SizedBox(height: 16),
-            EnrollmentCard(),
-            SizedBox(height: 16),
-            FacultyCard(),
+          children: [
+            const PerformanceCard(),
+            const SizedBox(height: 16),
+            const EnrollmentCard(),
+            const SizedBox(height: 16),
+            const FacultyCard(),
+            const SizedBox(height: 16),
+            const SubjectManagementCard(),
           ],
         ),
       ),
@@ -75,65 +77,19 @@ class PerformanceCard extends StatelessWidget {
               )
             ],
           ),
-
           const SizedBox(height: 10),
-
           const Text("3.62",
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-
           const Text("Promedio Semestre Actual",
               style: TextStyle(color: Colors.grey)),
-
-          const SizedBox(height: 20),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              BarItem(height: 60, label: "SEM 1"),
-              BarItem(height: 80, label: "SEM 2"),
-              BarItem(height: 50, label: "SEM 3"),
-              BarItem(height: 100, label: "SEM 4", highlight: true),
-            ],
-          )
         ],
       ),
     );
   }
 }
 
-class BarItem extends StatelessWidget {
-  final double height;
-  final String label;
-  final bool highlight;
-
-  const BarItem({
-    super.key,
-    required this.height,
-    required this.label,
-    this.highlight = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: 30,
-          height: height,
-          decoration: BoxDecoration(
-            color: highlight ? Colors.blue : Colors.blue.withOpacity(0.4),
-            borderRadius: BorderRadius.circular(6),
-          ),
-        ),
-        const SizedBox(height: 5),
-        Text(label, style: const TextStyle(fontSize: 10))
-      ],
-    );
-  }
-}
-
 //////////////////////////////////////////////////
-// 🎓 DISTRIBUCIÓN MATRÍCULAS
+// 🎓 MATRÍCULAS
 //////////////////////////////////////////////////
 
 class EnrollmentCard extends StatelessWidget {
@@ -144,50 +100,13 @@ class EnrollmentCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: cardStyle(),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Distribución de Matrículas",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              SizedBox(height: 20),
-              Text("TOTAL", style: TextStyle(color: Colors.grey)),
-              Text("12.4k",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            ],
-          ),
-
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              LegendItem("Pregrado (65%)", Colors.blue),
-              LegendItem("Posgrado (20%)", Colors.blueAccent),
-              LegendItem("Doctorado (15%)", Colors.lightBlue),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class LegendItem extends StatelessWidget {
-  final String text;
-  final Color color;
-
-  const LegendItem(this.text, this.color, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          CircleAvatar(radius: 5, backgroundColor: color),
-          const SizedBox(width: 8),
-          Text(text),
+          Text("Distribución de Matrículas",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          SizedBox(height: 10),
+          Text("TOTAL: 12.4k", style: TextStyle(color: Colors.grey)),
         ],
       ),
     );
@@ -195,7 +114,7 @@ class LegendItem extends StatelessWidget {
 }
 
 //////////////////////////////////////////////////
-// 👨‍🏫 DISTRIBUCIÓN DOCENTE
+// 👨‍🏫 DOCENTES
 //////////////////////////////////////////////////
 
 class FacultyCard extends StatelessWidget {
@@ -206,58 +125,14 @@ class FacultyCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: cardStyle(),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Text("Distribución Docente",
               style: TextStyle(fontWeight: FontWeight.bold)),
-
-          SizedBox(height: 20),
-
-          FacultyItem("Facultad STEM", "142 Miembros", 0.8),
-          FacultyItem("Artes y Humanidades", "86 Miembros", 0.5),
-          FacultyItem("Escuela de Negocios", "64 Miembros", 0.4),
-        ],
-      ),
-    );
-  }
-}
-
-class FacultyItem extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final double progress;
-
-  const FacultyItem(this.title, this.subtitle, this.progress, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Row(
-        children: [
-          const Icon(Icons.school, color: Colors.blue),
-
-          const SizedBox(width: 10),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text(subtitle, style: const TextStyle(color: Colors.grey)),
-              ],
-            ),
-          ),
-
-          SizedBox(
-            width: 80,
-            child: LinearProgressIndicator(
-              value: progress,
-              color: Colors.blue,
-              backgroundColor: Colors.grey[300],
-            ),
-          )
+          SizedBox(height: 10),
+          Text("Facultad STEM - 142 miembros"),
+          Text("Artes - 86 miembros"),
         ],
       ),
     );
@@ -265,7 +140,195 @@ class FacultyItem extends StatelessWidget {
 }
 
 //////////////////////////////////////////////////
-// 🎨 ESTILO GENERAL
+// 📚 GESTIÓN DE ASIGNATURAS PRO
+//////////////////////////////////////////////////
+
+class Subject {
+  String name;
+  String code;
+  int credits;
+  String teacher;
+
+  Subject({
+    required this.name,
+    required this.code,
+    required this.credits,
+    required this.teacher,
+  });
+}
+
+class SubjectManagementCard extends StatefulWidget {
+  const SubjectManagementCard({super.key});
+
+  @override
+  State<SubjectManagementCard> createState() =>
+      _SubjectManagementCardState();
+}
+
+class _SubjectManagementCardState extends State<SubjectManagementCard> {
+  final List<Subject> subjects = [
+    Subject(name: "Matemáticas", code: "MAT101", credits: 3, teacher: "Juan Pérez"),
+    Subject(name: "Programación", code: "CS102", credits: 4, teacher: "Ana López"),
+  ];
+
+  final TextEditingController searchController = TextEditingController();
+
+  List<Subject> get filtered {
+    final query = searchController.text.toLowerCase();
+    return subjects.where((s) {
+      return s.name.toLowerCase().contains(query) ||
+          s.code.toLowerCase().contains(query);
+    }).toList();
+  }
+
+  void openForm({Subject? subject}) {
+    final nameCtrl = TextEditingController(text: subject?.name ?? "");
+    final codeCtrl = TextEditingController(text: subject?.code ?? "");
+    final creditsCtrl =
+        TextEditingController(text: subject?.credits.toString() ?? "");
+    final teacherCtrl = TextEditingController(text: subject?.teacher ?? "");
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(subject == null ? "Nueva Asignatura" : "Editar Asignatura"),
+        content: SingleChildScrollView(
+          child: Column(
+            children: [
+              TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: "Nombre")),
+              TextField(controller: codeCtrl, decoration: const InputDecoration(labelText: "Código")),
+              TextField(
+                controller: creditsCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: "Créditos"),
+              ),
+              TextField(controller: teacherCtrl, decoration: const InputDecoration(labelText: "Profesor")),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancelar")),
+          ElevatedButton(
+            onPressed: () {
+              if (nameCtrl.text.isEmpty ||
+                  codeCtrl.text.isEmpty ||
+                  creditsCtrl.text.isEmpty ||
+                  teacherCtrl.text.isEmpty) return;
+
+              final credits = int.tryParse(creditsCtrl.text);
+              if (credits == null) return;
+
+              final exists = subjects.any((s) =>
+                  s.code == codeCtrl.text && s != subject);
+
+              if (exists) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Código ya existe")),
+                );
+                return;
+              }
+
+              setState(() {
+                if (subject == null) {
+                  subjects.add(Subject(
+                    name: nameCtrl.text,
+                    code: codeCtrl.text,
+                    credits: credits,
+                    teacher: teacherCtrl.text,
+                  ));
+                } else {
+                  subject.name = nameCtrl.text;
+                  subject.code = codeCtrl.text;
+                  subject.credits = credits;
+                  subject.teacher = teacherCtrl.text;
+                }
+              });
+
+              Navigator.pop(context);
+            },
+            child: const Text("Guardar"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void deleteSubject(Subject subject) {
+    setState(() {
+      subjects.remove(subject);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final list = filtered;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: cardStyle(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  "Gestión de Asignaturas",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              IconButton(
+                onPressed: () => openForm(),
+                icon: const Icon(Icons.add, color: Colors.blue),
+              )
+            ],
+          ),
+
+          TextField(
+            controller: searchController,
+            onChanged: (_) => setState(() {}),
+            decoration: const InputDecoration(
+              hintText: "Buscar asignatura...",
+              prefixIcon: Icon(Icons.search),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          if (list.isEmpty)
+            const Text("No hay asignaturas",
+                style: TextStyle(color: Colors.grey)),
+
+          ...list.map((subject) {
+            return ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.book, color: Colors.blue),
+              title: Text(subject.name),
+              subtitle: Text(
+                  "${subject.code} • ${subject.credits} créditos • ${subject.teacher}"),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.orange),
+                    onPressed: () => openForm(subject: subject),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => deleteSubject(subject),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+}
+
+//////////////////////////////////////////////////
+// 🎨 ESTILO
 //////////////////////////////////////////////////
 
 BoxDecoration cardStyle() {
@@ -273,11 +336,7 @@ BoxDecoration cardStyle() {
     color: Colors.white,
     borderRadius: BorderRadius.circular(20),
     boxShadow: const [
-      BoxShadow(
-        color: Colors.black12,
-        blurRadius: 5,
-      )
+      BoxShadow(color: Colors.black12, blurRadius: 5),
     ],
   );
 }
-
